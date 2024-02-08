@@ -4,7 +4,7 @@
 Estimating the magnitude of the expected ghost of the dichroic
 
 """
-
+import numpy as np
 
 def predicted_ghost(transm_front,refl_bbar,substrate_attentuation):
     """
@@ -26,7 +26,10 @@ def predicted_ghost(transm_front,refl_bbar,substrate_attentuation):
 
     """
     
-    ghosting_refl = ( ((transm_front/100)**2) * (refl_bbar/100) * (substrate_attentuation)**2) *100
+    ghosting_refl = np.empty_like(transm_front)
+        
+    for ray_i in range(np.shape(transm_front)[0]):
+        ghosting_refl[ray_i,:] = ( ((transm_front[ray_i,:]/100)**2) * (refl_bbar[ray_i,:]/100) * (substrate_attentuation[ray_i,:])**2) *100
     
     return ghosting_refl
 

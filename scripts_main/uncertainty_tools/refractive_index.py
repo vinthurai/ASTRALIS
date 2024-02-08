@@ -83,7 +83,7 @@ def refr_ind_error(wl,n_sys_error,error_material,config_multilayout,phys_l_front
     # Substrate Refractuve indices
     n_substrate_error = m_dict['n_substrate']['value']
     # Spectral performance
-    sys_index_r,sys_index_t,sys_index_ghost = spectral_analysis(wl,n_front_error,n_substrate_error,n_bbar_error,phys_l_front,phys_l_substrate,phys_l_bbar,theta,polar)
+    sys_index_r,sys_index_t,sys_index_ghost,_,_ = spectral_analysis(wl,n_front_error,n_substrate_error,n_bbar_error,phys_l_front,phys_l_substrate,phys_l_bbar,theta,polar)
 
     return sys_index_r,sys_index_t,sys_index_ghost
     

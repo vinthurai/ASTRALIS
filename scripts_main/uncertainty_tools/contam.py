@@ -88,7 +88,7 @@ def mol_contam_analysis(wl,n_incident,n_front,n_substrate,n_bbar,phys_l_front,
     phys_l_bbar_contam = np.concatenate((phys_l_bbar,phys_l_c_list_r))
              
     # Calculate the spectral performance of the contaminated dichroic
-    refl,transm, _ = spectral_analysis(wl,n_front_contam,n_substrate,n_bbar_contam,phys_l_front_contam,
+    refl,transm,_,_,_ = spectral_analysis(wl,n_front_contam,n_substrate,n_bbar_contam,phys_l_front_contam,
                                        phys_l_substrate,phys_l_bbar_contam,theta,polar)
     
     return refl,transm

@@ -68,7 +68,7 @@ def temp_error(wl,temp_sys_error,config_multilayout,phys_l_front,phys_l_substrat
     n_bbar = multi_layout(wl,n_H,n_L,n_incident_rear,n_substrate_rear,layout_sequence_rear)
 
     #Calculating the nominal spectral performance 
-    sys_temp_r,sys_temp_t,sys_temp_ghost = spectral_analysis(wl,n_front,n_substrate,n_bbar,phys_l_front,phys_l_substrate,phys_l_bbar,theta,polar)
+    sys_temp_r,sys_temp_t,sys_temp_ghost,_,_ = spectral_analysis(wl,n_front,n_substrate,n_bbar,phys_l_front,phys_l_substrate,phys_l_bbar,theta,polar)
     
     return sys_temp_r,sys_temp_t,sys_temp_ghost
 

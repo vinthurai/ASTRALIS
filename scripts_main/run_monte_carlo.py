@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
+Main script to run Monte Carlo for dichroic recipe
+
 Monte Carlo code seperated from other dichroics modelling code used to vary 
 thicknesses of coatings from measurements of thicknesses and reflection % 
 from graphs until reflection % of dichroics match initial conditions
@@ -8,12 +11,6 @@ from graphs until reflection % of dichroics match initial conditions
 These thicknesses are then used in further simulations to test tolerance of the 
 dichroic to uncertainties from various sources, including refractive index and 
 thickness of layers
-"""
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Main script to run Monte Carlo for dichroic recipe
 """
 
 #%% Importing Libraries 
@@ -29,7 +26,7 @@ import matplotlib.pyplot as plt
 # Local imports
 from general_tools.refractive_index import refr_index
 from general_tools.multilayer_structure import multi_layout
-from tlm_model.analysis import spectral_analysis
+from tlm_model.analysis import spectral_analysis,av_intensity
 from general_tools.analysis_tools import weighted_lsr
 from general_tools.monte_carlo import mc_recipe
 
@@ -62,13 +59,23 @@ for config_params,param_dict in zip(CONFIGFILES,[param,mc_param,contam_param,sys
                 param_dict[name][key]['value'] = data['value']
 
 config_multilayout = param['multilayer_layout']
-OutputFilePath = param['DEFAULT']['outputfilepath']
+
+# make output folder, if it doesn't exist
+OutputFilePath = f"{param['DEFAULT']['outputfilepath']}/run_monte_carlo"
+if not os.path.exists(OutputFilePath):
+    os.makedirs(OutputFilePath)
+# make folder for plots and data files
+if not os.path.exists(f"{OutputFilePath}/plots"):
+    os.makedirs(f"{OutputFilePath}/plots")
+if not os.path.exists(f"{OutputFilePath}/data"):
+    os.makedirs(f"{OutputFilePath}/data")
 
 
 #%% NOMINAL PERFORMANCE: Dichroic Parameters Setup
 
 # General modelling parameters
 theta = np.array([param['environmental']['angle_of_incidence']['value']]) #AOI in degrees
+n_rays = len(theta) # number of rays
 wl = np.arange(param['environmental']['wavelength_min']['value'],param['environmental']['wavelength_max']['value']+param['environmental']['delta_wavelength']['value'],param['environmental']['delta_wavelength']['value']) #wl_data#wavelength array in nm
 temp = param['environmental']['temperature']['value'] #temperature in kelvin
 polar = param['environmental']['polarisation']
@@ -98,7 +105,9 @@ layout_sequence_rear = config_multilayout['refr_index_layout_rear_coating_only']
 n_bbar = multi_layout(wl,n_H,n_L,n_incident_rear,n_substrate_rear,layout_sequence_rear)
 
 #Calculating the nominal spectral performance 
-initial_r,initial_t, _ = spectral_analysis(wl,n_front,n_substrate,n_bbar,phys_l_front,phys_l_substrate,phys_l_bbar,theta,polar)
+initial_r,initial_t,_,_,_ = spectral_analysis(wl,n_front,n_substrate,n_bbar,phys_l_front,phys_l_substrate,phys_l_bbar,theta,polar)
+initial_r = av_intensity(initial_r,n_rays)
+initial_t = av_intensity(initial_t,n_rays)
 
 
 #%% Monte Carlo Parameters
@@ -151,7 +160,7 @@ ax.set_ylim((0,100))
 ax.set_xlim((min(wl),max(wl)))
 ax.legend()
 ax.grid()
-fig.savefig(f"{OutputFilePath}/MC_initial_conditions.png",dpi=600)
+fig.savefig(f"{OutputFilePath}/plots/MC_initial_conditions.png",dpi=600)
 
 
 #%% Run Monte Carlo
@@ -168,7 +177,9 @@ while abs(diff_lsr) > 1e-10:
 phys_l_front = np.loadtxt(MC_output_front, dtype=float)
 phys_l_bbar = np.loadtxt(MC_output_bbar, dtype=float)
 #Calculating the nominal spectral performance 
-output_r,output_t,_ = spectral_analysis(wl,n_front,n_substrate,n_bbar,phys_l_front,phys_l_substrate,phys_l_bbar,theta,polar)
+output_r,output_t,_,_,_ = spectral_analysis(wl,n_front,n_substrate,n_bbar,phys_l_front,phys_l_substrate,phys_l_bbar,theta,polar)
+output_r = av_intensity(output_r,n_rays)
+output_t = av_intensity(output_t,n_rays)
 
 
 #%% Plotting Monte Carlo ouput
@@ -184,5 +195,5 @@ ax.set_ylim((0,100))
 ax.set_xlim((min(wl),max(wl)))
 ax.legend()
 ax.grid()
-fig.savefig(f"{OutputFilePath}/perf_after_MC.png",dpi=600)
+fig.savefig(f"{OutputFilePath}/plots/perf_after_MC.png",dpi=600)
   

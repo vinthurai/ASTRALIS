@@ -50,7 +50,7 @@ def angle_error(wl,sys_theta_error,n_front,n_substrate,n_bbar,phys_l_front,phys_
     theta_error = theta + sys_theta_error
     
     #Calculating the nominal spectral performance 
-    sys_theta_r,sys_theta_t,sys_theta_ghost = spectral_analysis(wl,n_front,n_substrate,n_bbar,phys_l_front,phys_l_substrate,phys_l_bbar,theta_error,polar)
+    sys_theta_r,sys_theta_t,sys_theta_ghost,_,_ = spectral_analysis(wl,n_front,n_substrate,n_bbar,phys_l_front,phys_l_substrate,phys_l_bbar,theta_error,polar)
     
     return sys_theta_r,sys_theta_t,sys_theta_ghost
 

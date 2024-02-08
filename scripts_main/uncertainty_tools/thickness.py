@@ -103,7 +103,7 @@ def random_thickness_errors_spectrum(wl,n_front,n_substrate,n_bbar,phys_l_error_
     # calculate the spectral performance after random thickness errors have been applied
     for m in np.arange(0,n_sample):
       print(m,'/',n_sample-1)
-      rand_dep_r[m,:],rand_dep_t[m,:],_ = spectral_analysis(wl,n_front,n_substrate,n_bbar,phys_l_error_front[m,:],phys_l_substrate,phys_l_error_rear[m,:],theta,polar)
+      rand_dep_r[m,:],rand_dep_t[m,:],_,_,_ = spectral_analysis(wl,n_front,n_substrate,n_bbar,phys_l_error_front[m,:],phys_l_substrate,phys_l_error_rear[m,:],theta,polar)
 
     print('Generating',n_sample,'random errors in thicknesses complete!')
     return rand_dep_r,rand_dep_t
@@ -164,8 +164,8 @@ def systematic_thickness_error(wl,n_front,n_substrate,n_bbar,phys_l_front,phys_l
         phys_l_error_front = phys_l_front + phys_l_front*sys_dep_error 
         phys_l_error_rear = phys_l_bbar + phys_l_bbar*sys_dep_error
     
-    sys_dep_r,sys_dep_t,sys_dep_ghost = spectral_analysis(wl,n_front,n_substrate,n_bbar,phys_l_error_front,phys_l_substrate,phys_l_error_rear,theta,polar)
+    sys_dep_r,sys_dep_t,sys_dep_ghost,sys_dep_r_phase,sys_dep_t_phase = spectral_analysis(wl,n_front,n_substrate,n_bbar,phys_l_error_front,phys_l_substrate,phys_l_error_rear,theta,polar)
 
-    return sys_dep_r,sys_dep_t,sys_dep_ghost,phys_l_error_front,phys_l_error_rear
+    return sys_dep_r,sys_dep_t,sys_dep_ghost,sys_dep_r_phase,sys_dep_t_phase,phys_l_error_front,phys_l_error_rear
 
 

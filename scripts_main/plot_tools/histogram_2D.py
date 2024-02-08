@@ -80,13 +80,17 @@ def double_contoured_2d_hist(wl,delta_perf1,delta_perf2,outputfolder):
     Parameters
     ----------
     wl : TYPE
-        DESCRIPTION.
-    delta_perf1 : TYPE
-        DESCRIPTION.
-    delta_perf2 : TYPE
-        DESCRIPTION.
-    outputfolder : TYPE
-        DESCRIPTION.
+        Wavelengths.
+    delta_perf1 : numpy.ndarray
+        Change in transmission/reflection from nominal case [%] for first histogram .
+    delta_perf2 : numpy.ndarray
+        Change in transmission/reflection from nominal case [%] for second histogram.
+    outputfolder : str
+        Name of output folder for plots.
+
+    Returns
+    -------
+    None.
 
     Returns
     -------

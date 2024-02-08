@@ -67,8 +67,8 @@ def mc_recipe(wl,step_size_max,bc_wl,bc_r,bc_t,w_lsr_input,min_phys_l,max_phys_l
     step_size_max = step_size_max/100 # maximum step size
     
     step_size = step_size_max # starting step size set to maximum
-    # when count reach 30, exit loop as solution may be a local minima
-    while step_size > 1e-10 or count < 10: # stop MC if set difference between LSR and previous LSR is below number
+    # when count reach maximum, exit loop as solution may be a local minima
+    while step_size > 1e-5 or count < 1e8: # stop MC if set difference between LSR and previous LSR is below number
         # generate random vector between -1 and 1 from a uniform distribution 
         phys_l = np.concatenate((phys_l_front, phys_l_bbar))
         random_variation = 2* np.random.rand(len(phys_l)) -1

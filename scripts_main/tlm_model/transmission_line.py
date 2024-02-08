@@ -9,6 +9,7 @@ reflectance and transmittance as a function wavelength
 
 # Importing Libraries
 import numpy as np
+from math import atan2
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -42,6 +43,10 @@ def transmline(wl,n,phys_l,theta,polar):
         Transmittance [%].
     output_theta : numpy.ndarray
         Angle of outgoing ray [degrees].
+    phase_refl : numpy.ndarray
+        Phase of reflected light as a function of wavelength [degrees].
+    phase_transm : numpy.ndarray
+        Phase of transmitted light as a function of wavelength [degrees].
 
     """
         
@@ -49,10 +54,16 @@ def transmline(wl,n,phys_l,theta,polar):
     theta = np.array([(theta)*np.pi/180])[0] # Convert AOI from degrees to radians
     M = np.shape(phys_l)[0] # Number of coating layers 
     S = len(wl) # Sampling size of wavelength array
-            
+    
     refl_perc_val = np.empty((np.size(theta),S)) # Nominal reflectance for each AOI
     transm_perc_val = np.empty((np.size(theta),S)) # Nominal reflectance for each AOI
     output_theta = np.empty(np.size(theta)) # Outgoing ray angle
+    phase_refl = np.empty((np.size(theta),S))
+    phase_transm = np.empty((np.size(theta),S))
+    
+    atan2_vec = np.vectorize(atan2) # so that the atan2 function can handle arrays
+
+
     
     # Loop to calculate function outputs for each AOI
     for theta_ind in range(len(theta)):
@@ -60,6 +71,7 @@ def transmline(wl,n,phys_l,theta,polar):
         kz = np.zeros_like(n, dtype='complex')         
         rho_t = np.zeros((S,M+1),dtype = 'complex') # Transverse Fresnel reflection coeff 
         tau_t = np.zeros((S,M+1),dtype = 'complex') # Transverse transmission coeff 
+        # first theta is the AOI to the dichroic and the last theta is the outgoing angle (i.e. angle of refraction to substrate or exiting angle from bbar)
         cos_theta_i = np.zeros((np.shape(n)),dtype = 'complex') # cos(theta),theta = angle in radians
         matrix_M = np.zeros((2, 2, S, M+1),dtype = 'complex') # Matching matrix across interface i and i+1 in the absence of roughness
                     
@@ -98,11 +110,22 @@ def transmline(wl,n,phys_l,theta,polar):
         s2 = matrix_S[1,0,:]     
         refl_perc_val[theta_ind,:] = abs(s2/s1)**2 *100 # Reflectance in %                                           
         transm_perc_val[theta_ind,:] = abs(1./s1)**2*n[:,-1]/n[:,0] *100 # Transmittance in %  
-            
+        
+        # Calculating the phase of the reflected beams
+        real_part_refl = np.real(s2/s1)
+        imag_part_refl = np.imag(s2/s1)
+        phase_val_refl = atan2_vec(imag_part_refl,real_part_refl)
+        phase_refl[theta_ind,:] = phase_val_refl*180/np.pi # converting to degrees
+        
+        # Calculating the phase of the transmitted beams
+        real_part_transm = np.real(1./s1)
+        imag_part_transm = np.imag(1./s1)
+        phase_val_transm = atan2_vec(imag_part_transm,real_part_transm)
+        phase_transm[theta_ind,:] = phase_val_transm*180/np.pi # onverting to degrees
+                                    
     # For the case of many rays with different AOI, finding the overall reflectance/transmittance
-    refl_perc = np.sum(refl_perc_val,axis=0)/np.size(theta)                       
-    transm_perc = np.sum(transm_perc_val,axis=0)/np.size(theta)
-    
-    return refl_perc,transm_perc,output_theta
-    
+    refl_perc = refl_perc_val                
+    transm_perc = transm_perc_val
 
+    return refl_perc,transm_perc,output_theta,phase_refl,phase_transm,
+    
